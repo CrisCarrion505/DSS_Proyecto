@@ -290,5 +290,11 @@
             {{-- <a href="{{ route('examen.show') }}" class="btn">Iniciar Examen ➤</a> --}}
         </div>
     </div>
+    <form action="{{ route('exams.publish', $exam_id) }}" method="POST" style="display:inline-block; margin-left: 10px;">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="btn">📢 Publicar Examen</button>
+    </form>
+
 </body>
 </html>

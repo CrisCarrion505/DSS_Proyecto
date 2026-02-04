@@ -10,24 +10,104 @@
             <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
-
-            <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
-                </flux:navlist.group>
-            </flux:navlist>
+        {{-- Dashboard (todos) --}}
+        <flux:navlist.item
+            icon="home"
+            :href="route('dashboard')"
+            :current="request()->routeIs('dashboard')"
+            wire:navigate
+        >
+            {{ __('Dashboard') }}
+        </flux:navlist.item>
 
+        {{-- Cursos (profesor y estudiante) --}}
+        <flux:navlist.item
+            icon="home"
+            :href="route('courses.index')"
+            :current="request()->routeIs('courses.*')"
+            wire:navigate
+        >
+            {{ __('Cursos') }}
+        </flux:navlist.item>
+
+        {{-- Estudiante: Reconocimiento + Examen --}}
+        @role('estudiante')
+            <flux:navlist.item
+                icon="home"
+                :href="route('face')"
+                :current="request()->routeIs('face')"
+                wire:navigate
+            >
+                {{ __('Reconocimiento') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item
+                icon="home"
+                :href="route('examen.show')"
+                :current="request()->routeIs('examen.*')"
+                wire:navigate
+            >
+                {{ __('Examen') }}
+            </flux:navlist.item>
+        @endrole
+
+        {{-- Profesor: Crear curso + Crear examen --}}
+        @role('profesor')
+            <flux:navlist.item
+                icon="plus"
+                :href="route('courses.create')"
+                :current="request()->routeIs('courses.create')"
+                wire:navigate
+            >
+                {{ __('Crear curso') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item
+                icon="plus"
+                :href="route('exams.create')"
+                :current="request()->routeIs('exams.*')"
+                wire:navigate
+            >
+                {{ __('Crear examen') }}
+            </flux:navlist.item>
+        @endrole
+    </flux:navlist.group>
             <flux:spacer />
-
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
+
+    {{-- Opcional: grupo de configuración (si quieres que settings sea pestaña, no solo en el dropdown) --}}
+    <flux:navlist.group :heading="__('Configuración')" class="grid mt-2">
+            <flux:navlist.item
+                icon="cog"
+                :href="route('profile.edit')"
+                :current="request()->routeIs('profile.edit')"
+                wire:navigate
+            >
+                {{ __('Perfil') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item
+                icon="key"
+                :href="route('user-password.edit')"
+                :current="request()->routeIs('user-password.edit')"
+                wire:navigate
+            >
+                {{ __('Contraseña') }}
+            </flux:navlist.item>
+
+            <flux:navlist.item
+                icon="home"
+                :href="route('appearance.edit')"
+                :current="request()->routeIs('appearance.edit')"
+                wire:navigate
+            >
+                {{ __('Apariencia') }}
+            </flux:navlist.item>
+        </flux:navlist.group>
+    </flux:navlist>
+
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">

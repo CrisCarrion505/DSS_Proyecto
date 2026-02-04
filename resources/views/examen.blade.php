@@ -234,6 +234,19 @@
             spanEstado.className = 'error';
         }
     }
+      // ✅ 1) Enviar al padre (tu vista prueba.blade.php)
+    window.parent.postMessage(
+      { type: "proctoring_metrics", payload: data },
+      window.location.origin
+    );
+    window.addEventListener("message", (event) => {
+  if (event.origin !== window.location.origin) return;
+  if (!event.data || event.data.type !== "proctoring_command") return;
+
+  if (event.data.action === "start") startWS();
+  if (event.data.action === "stop")  stopWS();
+});
+
     </script>
 </body>
 </html>

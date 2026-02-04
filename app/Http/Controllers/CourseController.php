@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
-
+use App\Models\Exam;
+use App\Models\ExamResult;
 class CourseController extends Controller
 {
     /**
@@ -52,8 +53,29 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
-        return view('courses.show', compact('course'));
+        $course->load(['teacher', 'activeExam']);
+
+        $isTeacherOwner = auth()->check()
+            && auth()->user()->hasRole('profesor')
+            && $course->teacher_id === auth()->id();
+
+        $stats = [
+            'taken' => ExamResult::whereHas('exam', fn($q) => $q->where('course_id', $course->id))->count(),
+            'flagged' => ExamResult::whereHas('exam', fn($q) => $q->where('course_id', $course->id))
+                        ->where('status','flagged')->count(),
+            'avg' => ExamResult::whereHas('exam', fn($q) => $q->where('course_id', $course->id))
+                    ->avg('percentage') ?? 0,
+        ];
+
+        $latestResults = ExamResult::whereHas('exam', fn($q) => $q->where('course_id', $course->id))
+            ->with(['student','exam'])
+            ->latest()
+            ->take(20)
+            ->get();
+
+        return view('courses.show', compact('course','isTeacherOwner','stats','latestResults'));
     }
+
 
     /**
      * Formulario de edición

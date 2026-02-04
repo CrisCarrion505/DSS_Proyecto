@@ -4,12 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Examen - EduSecure</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    {{-- <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,7 +18,7 @@
         }
 
         .container {
-            max-width: 500px;
+            max-width: 520px;
             width: 100%;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -45,18 +41,11 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
+        .header p { opacity: 0.9; font-size: 1.1rem; }
 
-        .form-container {
-            padding: 40px;
-        }
+        .form-container { padding: 40px; }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
+        .form-group { margin-bottom: 22px; }
 
         .form-group label {
             display: block;
@@ -66,7 +55,10 @@
             font-size: 1rem;
         }
 
-        .form-group input {
+        /* ✅ input, select, textarea con mismo estilo */
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
             padding: 16px 20px;
             border: 2px solid #e5e7eb;
@@ -77,12 +69,22 @@
             font-family: inherit;
         }
 
-        .form-group input:focus {
+        .form-group textarea { min-height: 110px; resize: vertical; }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #4f46e5;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
             background: white;
             transform: translateY(-1px);
+        }
+
+        .hint {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #6b7280;
         }
 
         .error-messages {
@@ -94,10 +96,7 @@
             box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
-        .error-messages ul {
-            list-style: none;
-            padding: 0;
-        }
+        .error-messages ul { list-style: none; padding: 0; }
 
         .error-messages li {
             padding: 5px 0;
@@ -135,9 +134,7 @@
             box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
         }
 
-        .submit-btn:active {
-            transform: translateY(-1px);
-        }
+        .submit-btn:active { transform: translateY(-1px); }
 
         .submit-btn::before {
             content: '';
@@ -150,9 +147,7 @@
             transition: left 0.5s;
         }
 
-        .submit-btn:hover::before {
-            left: 100%;
-        }
+        .submit-btn:hover::before { left: 100%; }
 
         .back-link {
             text-align: center;
@@ -172,30 +167,15 @@
             transition: all 0.3s ease;
         }
 
-        .back-link a:hover {
-            color: #7c3aed;
-            transform: translateX(-5px);
-        }
+        .back-link a:hover { color: #7c3aed; transform: translateX(-5px); }
 
         @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                margin: 10px;
-                border-radius: 16px;
-            }
-
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .form-container {
-                padding: 25px;
-            }
+            body { padding: 10px; }
+            .container { margin: 10px; border-radius: 16px; }
+            .header h1 { font-size: 1.8rem; }
+            .form-container { padding: 25px; }
         }
-    </style>
+    </style> --}}
 </head>
 <body>
     <div class="container">
@@ -218,6 +198,35 @@
             <form action="{{ route('exams.store') }}" method="POST">
                 @csrf
 
+                {{-- ✅ Curso --}}
+                <div class="form-group">
+                    <label for="course_id">📚 Curso</label>
+                    <select id="course_id" name="course_id" required>
+                        <option value="" disabled {{ old('course_id') ? '' : 'selected' }}>
+                            Selecciona un curso
+                        </option>
+
+                        @foreach(($courses ?? []) as $course)
+                            <option value="{{ $course->id }}"
+                                {{ (string)old('course_id') === (string)$course->id ? 'selected' : '' }}>
+                                {{ $course->course_id }} — {{ $course->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="hint">Este examen se publicará en el curso seleccionado.</div>
+                </div>
+
+                {{-- ✅ Nivel --}}
+                <div class="form-group">
+                    <label for="level">⚡ Nivel</label>
+                    <select id="level" name="level" required>
+                        <option value="basico" {{ old('level','basico')==='basico' ? 'selected' : '' }}>Básico</option>
+                        <option value="intermedio" {{ old('level')==='intermedio' ? 'selected' : '' }}>Intermedio</option>
+                        <option value="avanzado" {{ old('level')==='avanzado' ? 'selected' : '' }}>Avanzado</option>
+                    </select>
+                </div>
+
+                {{-- ✅ Calificación máxima --}}
                 <div class="form-group">
                     <label for="score_max">📊 Calificación máxima</label>
                     <input type="number" id="score_max" name="score_max"
@@ -225,6 +234,7 @@
                            placeholder="Ej: 20">
                 </div>
 
+                {{-- ✅ Número de preguntas --}}
                 <div class="form-group">
                     <label for="questions_count">📝 Número de preguntas</label>
                     <input type="number" id="questions_count" name="questions_count"
@@ -232,11 +242,19 @@
                            placeholder="Ej: 10">
                 </div>
 
+                {{-- ✅ Tema --}}
                 <div class="form-group">
                     <label for="topic">🎯 Tema del examen</label>
                     <input type="text" id="topic" name="topic"
                            value="{{ old('topic') }}" required
                            placeholder="Ej: Programación web, Matemáticas, Historia...">
+                </div>
+
+                {{-- ✅ Descripción (opcional) --}}
+                <div class="form-group">
+                    <label for="description">🧾 Descripción (opcional)</label>
+                    <textarea id="description" name="description"
+                              placeholder="Ej: Examen parcial, incluye unidad 1 y 2...">{{ old('description') }}</textarea>
                 </div>
 
                 <button type="submit" class="submit-btn">
@@ -246,7 +264,8 @@
         </div>
 
         <div class="back-link">
-            {{-- <a href="{{ route('examen.show') }}">← Volver al panel principal</a> --}}
+            {{-- Pon aquí tu ruta real del dashboard del profesor si quieres --}}
+            {{-- <a href="{{ route('profesor.dashboard') }}">← Volver</a> --}}
         </div>
     </div>
 </body>

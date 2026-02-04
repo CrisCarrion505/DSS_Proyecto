@@ -107,5 +107,95 @@
                 </div>
             @endcan
         @endrole
+        @role('profesor')
+        @if($isTeacherOwner)
+        <div class="mt-6 rounded-xl border border-neutral-200 bg-white p-5 dark:border-neutral-700 dark:bg-neutral-900">
+            <div class="flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">Panel de Examen</h2>
+
+            <a href="{{ route('courses.exams.create', $course) }}"
+                class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">
+                + Generar examen para este curso
+            </a>
+            </div>
+
+            <div class="mt-4 grid gap-3 md:grid-cols-3">
+            <div class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Estudiantes que rindieron</p>
+                <p class="text-2xl font-bold">{{ $stats['taken'] }}</p>
+            </div>
+            <div class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Flagged</p>
+                <p class="text-2xl font-bold">{{ $stats['flagged'] }}</p>
+            </div>
+            <div class="rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Promedio</p>
+                <p class="text-2xl font-bold">{{ number_format($stats['avg'], 1) }}%</p>
+            </div>
+            </div>
+
+            <div class="mt-5 rounded-lg border border-neutral-200 p-4 dark:border-neutral-700">
+            <p class="font-semibold">Examen activo:</p>
+
+            @if($course->activeExam)
+                <div class="mt-2 flex items-center justify-between gap-3">
+                <div>
+                    <p class="font-bold">{{ $course->activeExam->titulo }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ $course->activeExam->questions_count }} preguntas • Máx {{ $course->activeExam->score_max }} pts
+                    </p>
+                </div>
+
+                <form method="POST" action="{{ route('exams.publish', $course->activeExam) }}">
+                    @csrf
+                    @method('PATCH')
+                    <button class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+                    Re-publicar (hacerlo activo)
+                    </button>
+                </form>
+                </div>
+            @else
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No hay examen activo publicado.</p>
+            @endif
+            </div>
+
+            <div class="mt-5">
+            <p class="mb-2 font-semibold">Últimos resultados</p>
+
+            @if($latestResults->count())
+                <div class="overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700">
+                <table class="w-full text-sm">
+                    <thead class="bg-neutral-50 dark:bg-neutral-800">
+                    <tr>
+                        <th class="p-3 text-left">Estudiante</th>
+                        <th class="p-3 text-left">Examen</th>
+                        <th class="p-3 text-left">Nota</th>
+                        <th class="p-3 text-left">Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($latestResults as $r)
+                        <tr class="border-t border-neutral-200 dark:border-neutral-700">
+                        <td class="p-3">{{ $r->student->name }}</td>
+                        <td class="p-3">{{ $r->exam->titulo }}</td>
+                        <td class="p-3">{{ $r->percentage }}%</td>
+                        <td class="p-3">
+                            <span class="{{ $r->status === 'flagged' ? 'text-red-500 font-bold' : 'text-emerald-500 font-bold' }}">
+                            {{ strtoupper($r->status) }}
+                            </span>
+                        </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+                </div>
+            @else
+                <p class="text-sm text-gray-500 dark:text-gray-400">Aún no hay resultados.</p>
+            @endif
+            </div>
+        </div>
+        @endif
+        @endrole
+
     </div>
 </x-layouts.app>
